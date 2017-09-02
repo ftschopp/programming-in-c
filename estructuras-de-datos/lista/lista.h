@@ -1,5 +1,5 @@
 /*
- *ftschopp Lista simplemente enlazada
+ *ftschopp Lista doblemente enlazada
  * 
  */
 
