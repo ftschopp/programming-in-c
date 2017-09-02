@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include "lista.h"
+#include "queue.h"
 
 
 //Definicion de funciones
@@ -29,7 +28,7 @@ int isEmpty(node* t)
 }
 
 //inserta al final
-void insert(node **first, node **last, data info)
+void push(node **first, node **last, data info)
 {
     node *q;
     q = new_node();
@@ -48,18 +47,15 @@ void insert(node **first, node **last, data info)
     }
 }
 
-
-//remove
-data remove(node **first) 
+//pop obtiene el primer elemento de la cola
+node* pop(node **first) 
 {
-   data info = NULL;
-   
+    node *aux = NULL;
    if(!isEmpty(*first))
    {
-        info = (*first)->info;
+        aux = (*first);        
         (*first) = (*first)->next;
-        free()
    }
    
-    return data;
+    return aux;
 }

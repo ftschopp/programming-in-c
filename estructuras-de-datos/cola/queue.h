@@ -25,12 +25,9 @@ node* new_node();
 int isEmpty(node* t);
 
 //Insert a new node in a queue
-void insert(node **first, data info);
+void push(node **first, node **last, data info);
 
 //Remove front node of a queue
-node* remove(node **first);
-
-//show queue
-void show_queue(node **first);
+node* pop(node **first);
 
 #endif
