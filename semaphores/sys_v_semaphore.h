@@ -36,5 +36,4 @@ void sem_mutex_post(int *semid);
 //elimina el semaforo de los recursos del SO
 void sem_destroy(int *semid);
 
-
 #endif
