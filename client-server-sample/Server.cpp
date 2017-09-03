@@ -7,11 +7,7 @@
 # clientes, segun ciertos comandos, dara respuesta al cliente segun lo solicitado.
 # Ver la ayuda del comando
 #####################################################################################
-# INTEGRANTES:
-# MIRA ARIEL      | DNI 36169962 | ariel.j.mira@gmail.com
-# PINTOS LEANDRO    | DNI 35901158 | leopintos11@gmail.com
-# TORTORELLI EMILIANO   | DNI 35727845 | e.tortorelli1991@gmail.com
-# TSCHOPP FERNANDO    | DNI 33035058 | tschoppfernando@gmail.com
+# TSCHOPP FERNANDO   tschoppfernando@gmail.com
 #
 # Fecha de Creación: 10/06/2014
 #####################################################################################
