@@ -1,4 +1,4 @@
-# programming-in-c Unix System calls
+# Programming in C UNIX System Calls and Subroutines using C
 
 This repository contains some basic funtions and modules to do differents syscall.
 For example:
