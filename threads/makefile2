@@ -1,0 +1,9 @@
+CC 		= gcc 
+
+all : multi_thr 
+
+multi_thr: multi_thr.c	
+	cc -o multi_thr multi_thr.c
+
+clean: 
+	rm -rf *o multi_thr
