@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #define NTHREADS 10
 void *thread_function(void *);
@@ -16,6 +17,7 @@ main()
       pthread_create( &thread_id[i], NULL, thread_function, NULL );
    }
 
+   usleep(1000 * 5000);
    for(j=0; j < NTHREADS; j++)
    {
       pthread_join( thread_id[j], NULL); 
