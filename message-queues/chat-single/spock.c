@@ -5,6 +5,21 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
+typedef struct
+{
+    int nro_jugador;
+    int nro_pensado;
+    char mtext[200];
+    
+}MessageInfo;
+
+typedef struct
+{
+    long mtype;
+    MessageInfo info;
+}MessageQueue;
+
+
 struct my_msgbuf {
     long mtype;
     char mtext[200];
@@ -12,7 +27,8 @@ struct my_msgbuf {
 
 int main(void)
 {
-    struct my_msgbuf buf;
+    //struct my_msgbuf buf;
+    MessageQueue buf;
     int msqid;
     key_t key;
 
@@ -29,11 +45,11 @@ int main(void)
     printf("spock: ready to receive messages, captain.\n");
 
     for(;;) { /* Spock never quits! */
-        if (msgrcv(msqid, &buf, sizeof buf.mtext, 0, 0) == -1) {
+        if (msgrcv(msqid, &buf, sizeof buf.info, 0, 0) == -1) {
             perror("msgrcv");
             exit(1);
         }
-        printf("spock: \"%s\"\n", buf.mtext);
+        printf("spock: \"%s\"\n", buf.info.mtext);
     }
 
     return 0;

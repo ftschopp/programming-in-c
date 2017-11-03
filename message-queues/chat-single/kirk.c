@@ -6,6 +6,20 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
+typedef struct
+{
+    int nro_jugador;
+    int nro_pensado;
+    char mtext[200];
+    
+}MessageInfo;
+
+typedef struct
+{
+    long mtype;
+    MessageInfo info;
+}MessageQueue;
+
 struct my_msgbuf {
     long mtype;
     char mtext[200];
@@ -13,7 +27,8 @@ struct my_msgbuf {
 
 int main(void)
 {
-    struct my_msgbuf buf;
+    //struct my_msgbuf buf;
+    MessageQueue buf;
     int msqid;
     key_t key;
 
@@ -31,11 +46,11 @@ int main(void)
 
     buf.mtype = 1; /* we don't really care in this case */
 
-    while(fgets(buf.mtext, sizeof buf.mtext, stdin) != NULL) {
-        int len = strlen(buf.mtext);
+    while(fgets(buf.info.mtext, sizeof buf.info.mtext, stdin) != NULL) {
+        int len = strlen(buf.info.mtext);
 
         /* ditch newline at end, if it exists */
-        if (buf.mtext[len-1] == '\n') buf.mtext[len-1] = '\0';
+        if (buf.info.mtext[len-1] == '\n') buf.info.mtext[len-1] = '\0';
 
         if (msgsnd(msqid, &buf, len+1, 0) == -1) /* +1 for '\0' */
             perror("msgsnd");
