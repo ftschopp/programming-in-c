@@ -8,34 +8,38 @@
 
 int createMessageQueue(int key)
 {
-	int id_queue = msgget(creo_clave(key), 0600 | IPC_CREAT);
-	if (id_queue == -1)
+	int msqid = msgget(creo_clave(key), 0644 | IPC_CREAT);
+	if (msqid == -1)
 	{
 		printf("Error al obtener identificador para cola mensajes\n");
 		exit (-1);
 	}
-	return id_queue;
+	return msqid;
 }
 
-int sendMessage(int msqid, long mtype, MessageInfo info)
+void cleanMessageQueue(int msqid)
 {
-    MessageQueue mq;
-    mq.mtype = mtype;
-    mq.info = info;
-    return msgsnd(msqid, &mq, sizeof(info), 0);
-}		
-
-int receiveMessage(int msqid, long mtype, MessageInfo* (info))
-{
-    return msgrcv(msqid, info, sizeof(*info), 2, 0);
-}
-
-void cleanQueue(int id_queue)
-{
-    if (msgctl(id_queue, IPC_RMID, NULL) == -1) 
+    if (msgctl(msqid, IPC_RMID, NULL) == -1) 
     {
 		printf("Message queue could not be deleted.\n");
         exit(EXIT_FAILURE);
     }
 }
 
+void sendMessageQueue(int msqid, MessageQueue *mq)
+{
+    if (msgsnd(msqid, mq, sizeof((*mq).info), 0) == -1) /* +1 for '\0' */
+    {
+        perror("msgsnd");
+        exit(1);
+    }
+}		
+
+void recvMessageQueue(int msqid, MessageQueue *mq)
+{
+    if (msgrcv(msqid, mq, sizeof((*mq).info), 0, 0) == -1) 
+    {
+        perror("msgrcv");
+        exit(1);
+    }
+}

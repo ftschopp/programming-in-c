@@ -45,11 +45,11 @@ int main(void)
     printf("spock: ready to receive messages, captain.\n");
 
     for(;;) { /* Spock never quits! */
-        if (msgrcv(msqid, &buf, sizeof buf.info, 0, 0) == -1) {
+        if (msgrcv(msqid, &buf, sizeof(buf.info), 0, 0) == -1) {
             perror("msgrcv");
             exit(1);
         }
-        printf("spock: \"%s\"\n", buf.info.mtext);
+        printf("nro jugador %d nro pensado %d spock: \"%s\"\n",buf.info.nro_jugador, buf.info.nro_pensado, buf.info.mtext);
     }
 
     return 0;

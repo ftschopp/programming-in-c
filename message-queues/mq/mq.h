@@ -21,7 +21,7 @@ typedef struct
 {
     int nro_jugador;
     int nro_pensado;
-    TipoMensaje tipo;
+    char mtext[200];
 }MessageInfo;
 
 typedef struct
@@ -31,8 +31,8 @@ typedef struct
 }MessageQueue;
 
 int createMessageQueue(int key);
-int sendMessage(int id_queue, long mtype, MessageInfo info);
-int receiveMessage(int id_queue, long mtype, MessageInfo* info);
-void cleanQueue(int id_queue);
+void cleanMessageQueue(int msqid);
+void sendMessageQueue(int msqid, MessageQueue *mq);
+void recvMessageQueue(int msqid, MessageQueue *mq);
 
 #endif
