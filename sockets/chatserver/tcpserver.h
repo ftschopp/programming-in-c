@@ -32,5 +32,7 @@ void closeSocket(int sockfd);
 void shutdownSocket(int sockfd);
 //Imprimimos la direccion ip
 void print_ip_addr(struct sockaddr_in addr);
+//connect to server
+tcpClient connectTCPServer(char *hostname, int port);
 
 #endif

@@ -100,3 +100,38 @@ void shutdownSocket(int sockfd)
 {
 	shutdown(sockfd, SHUT_WR);
 }
+
+
+tcpClient connectTCPServer(char *hostname, int port)
+{
+	int sockfd;
+	tcpClient client;
+	struct hostent *server;
+   
+	/* Create a socket point */
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (sockfd < 0) {
+		perror("ERROR opening socket");
+		exit(1);
+	}
+
+	server = gethostbyname(hostname);
+
+	if (server == NULL) {
+		fprintf(stderr,"ERROR, no such host\n");
+		exit(0);
+	}
+
+	client.addr.sin_family = AF_INET;
+	client.addr.sin_port = htons(port);
+	client.connfd = sockfd;
+
+	/* Now connect to the server */
+	if (connect(sockfd, (struct sockaddr*)&client.addr, sizeof(client.addr)) < 0) {
+		perror("ERROR connecting");
+		exit(1);
+	}
+
+	return client;
+}

@@ -222,8 +222,6 @@ void listAllClients()
         ntohs((header->info.client.addr.sin_port)));
         printf("\n--");        
         header = header->next;
-        
-        header = header->next;
     }
 }
 
