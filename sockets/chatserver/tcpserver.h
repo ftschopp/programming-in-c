@@ -13,15 +13,10 @@ typedef struct{
     struct sockaddr_in addr;
 }tcpServer;
 
-typedef struct{
-    int connfd;
-    struct sockaddr_in addr;
-}tcpClient;
-
 void createTCPServer(tcpServer *server);
 
-//Accept receive listen file descriptor & return tcpClient
-tcpClient* acceptConnection(int listenfd);
+//Accept receive listen file descriptor 
+int acceptConnection(int listenfd);
 //Lee del socket
 int readSocket(int sockfd, char *buff_in, int len);
 //Escribe en el socket
@@ -33,6 +28,6 @@ void shutdownSocket(int sockfd);
 //Imprimimos la direccion ip
 void print_ip_addr(struct sockaddr_in addr);
 //connect to server
-tcpClient connectTCPServer(char *hostname, int port);
+int connectTCPServer(char *hostname, int port);
 
 #endif

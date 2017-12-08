@@ -8,13 +8,16 @@
 #include <pthread.h>
 #include "tcpserver.h"
 #include "lista.h"
+#define CLIENT_BASE_KEY 100
 
+void initClientData(clientData *cli, int connfd);
 void handleSigint();
 void print_client_addr(struct sockaddr_in addr);
 void strip_newline(char *s);
 void *handleClient(void *arg);
-void procesaMensaje(tcpClient *cli, char* buff); 
-void sendMessageAll(tcpClient *clientOrigin, char * buff);
+void procesaMensaje(clientData *cli, char* buff); 
+void renameClient(clientData *cli, char *name);
+void sendMessageAll(clientData *clientOrigin, char * buff);
 void listAllClients();
 
 typedef enum
@@ -23,6 +26,7 @@ typedef enum
     CMD_PING,
     CMD_HELP,
     CMD_SHOW_CLIENTS,
+    CMD_NAME,
     CMD_UNKNOW
 }commandType;
 
@@ -43,20 +47,33 @@ int main(int argc, char *argv[])
 
     while(1)
     {
-        tcpClient *client = acceptConnection(server->listenfd);        
-        printf("\nConnection Accepted %d", client->connfd);
+        int clientConnfd = acceptConnection(server->listenfd);        
+        printf("\nConnection Accepted %d", clientConnfd);
         
-        data d;
-        d.client = *client;
-        d.key = ++clientNumber;
-        strncpy(d.name, "noname", 30);
-        insert(&first, &last, d);
+        clientData *cli = malloc(sizeof(clientData));
 
-		pthread_create(&tid, NULL, &handleClient, (void*)client);
+        initClientData(cli, clientConnfd);
+
+        insert(&first, &last, *cli);
+        
+		pthread_create(&tid, NULL, &handleClient, (void*)&last->info);
 
 		sleep(1);
     }
 } 
+
+void initClientData(clientData *cli, int connfd)
+{
+    cli->connfd = connfd;
+    cli->key = CLIENT_BASE_KEY + getCount(first);
+    strncpy(cli->name, "noname", sizeof(cli->name));
+    
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    int res = getpeername(connfd, (struct sockaddr *)&addr, &addr_size);
+
+    cli->addr = addr;
+}
 
 void handleSigint()
 {
@@ -89,7 +106,7 @@ void *handleClient(void *arg)
 	    return NULL;
     }
 
-    tcpClient *cli = (tcpClient *)arg;
+    clientData *cli = (clientData *)arg;
 
 	printf("<<ACCEPT NEW CLIENT REFERENCED BY %d \n", cli->connfd);
 	print_ip_addr(cli->addr);
@@ -104,8 +121,9 @@ void *handleClient(void *arg)
 
         if(bytesRecved > 0)
         {
-            printf("Proceso Msj");
-            procesaMensaje(cli, buff_in);        
+            printf("\nProceso Msj");
+            fflush(stdout);
+            procesaMensaje(cli, buff_in);       
         }
         else if(bytesRecved == 0)
         {
@@ -133,7 +151,7 @@ void *handleClient(void *arg)
 	return NULL;
 }
 
-commandType getCommand(char *buff_in)
+commandType getCommand(char *buff_in, char **param)
 {
     char *cmd = strtok(buff_in," ");
     if(!strcmp(cmd,":QUIT")){
@@ -142,6 +160,10 @@ commandType getCommand(char *buff_in)
         return  CMD_PING;
     }else if(!strcmp(cmd,":HELP")){
         return CMD_HELP;
+    }else if(!strcmp(cmd,":NAME")){
+        *param = strtok(NULL, " ");
+        printf("valor %s",*param);
+        return CMD_NAME;
     }else if(!strcmp(cmd,":SHOW_CLIENTS")){
         return CMD_SHOW_CLIENTS;
     }
@@ -151,19 +173,19 @@ commandType getCommand(char *buff_in)
     }
 }
 
-void procesaMensaje(tcpClient *clientOrigin, char *buff_in)
+void procesaMensaje(clientData *clientOrigin, char *buff_in)
 {
     //ignoramos mensajes vacio
     if(!strlen(buff_in)){
         return;
     }
-
+    char buff_out[1024];
     strip_newline(buff_in);
-
+    char *param;
     //Detectamos comandos especiales
     if(buff_in[0] == ':')
     {   
-        switch(getCommand(buff_in))
+        switch(getCommand(buff_in, &param))
         {
             case CMD_QUIT:
                 printf("\nComando Quit");
@@ -177,6 +199,9 @@ void procesaMensaje(tcpClient *clientOrigin, char *buff_in)
             case CMD_SHOW_CLIENTS:
                 listAllClients();
                 break;
+            case CMD_NAME:
+                renameClient(clientOrigin, param);
+                break;
             case CMD_UNKNOW:
                 printf("\nComando desconocido");
                 break;
@@ -184,21 +209,29 @@ void procesaMensaje(tcpClient *clientOrigin, char *buff_in)
     }
     else
     {
-        printf("msj > %s\n", buff_in);
-        sendMessageAll(clientOrigin, buff_in);
+        printf("msj > %s %s\n", clientOrigin->name, buff_in);
+        fflush(stdout);
+        sprintf(buff_out, "[%s] %s\r\n", clientOrigin->name, buff_in);
+        sendMessageAll(clientOrigin, buff_out);
         //envio el mensaje a todos los clientes
     }    
 }
 
-void sendMessageAll(tcpClient* clientOrigin, char * buff_out)
+void renameClient(clientData *cli, char *name)
+{
+    node *valor = find_by_key(&first, cli->key);
+    strcpy(valor->info.name, name);
+}
+
+void sendMessageAll(clientData* clientOrigin, char * buff_out)
 {
     node* header = first;  
 
     while(header)
     {
-        if(clientOrigin->connfd != header->info.client.connfd)
+        if(clientOrigin->connfd != header->info.connfd)
         {
-            int bytesSended = writeSocket(header->info.client.connfd, buff_out, strlen(buff_out));
+            int bytesSended = writeSocket(header->info.connfd, buff_out, strlen(buff_out));
         }
         
         header = header->next;
@@ -213,13 +246,13 @@ void listAllClients()
     {
         printf("\nKey Nodo: %d", header->info.key);
         printf("\nName: %s", header->info.name);
-        printf("\nConnfd: %d", header->info.client.connfd);
+        printf("\nConnfd: %d", header->info.connfd);
         printf("\nIP %d.%d.%d.%d:%d",
-		header->info.client.addr.sin_addr.s_addr & 0xFF,
-		(header->info.client.addr.sin_addr.s_addr & 0xFF00)>>8,
-		(header->info.client.addr.sin_addr.s_addr & 0xFF0000)>>16,
-		(header->info.client.addr.sin_addr.s_addr & 0xFF000000)>>24,
-        ntohs((header->info.client.addr.sin_port)));
+		header->info.addr.sin_addr.s_addr & 0xFF,
+		(header->info.addr.sin_addr.s_addr & 0xFF00)>>8,
+		(header->info.addr.sin_addr.s_addr & 0xFF0000)>>16,
+		(header->info.addr.sin_addr.s_addr & 0xFF000000)>>24,
+        ntohs((header->info.addr.sin_port)));
         printf("\n--");        
         header = header->next;
     }

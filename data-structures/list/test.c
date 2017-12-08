@@ -12,7 +12,7 @@ int main(int argc, const char * argv[])
 
     data info1;
     info1.key = 1;
-    strncpy(info1.name, "fernando", 30);
+
 
     data info2;
     info2.key = 2;

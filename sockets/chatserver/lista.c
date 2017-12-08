@@ -29,7 +29,7 @@ int isEmpty(node* t)
 }
 
 //inserta al final
-void insert(node **first, node **last, data info)
+void insert(node **first, node **last, clientData info)
 {
     node *q;
     q = new_node();
@@ -51,7 +51,7 @@ void insert(node **first, node **last, data info)
 }
 
 //insert at first position
-void insert_at_first(node **first, node **last, data info)
+void insert_at_first(node **first, node **last, clientData info)
 {
     node *q;
     q = new_node();
@@ -207,4 +207,19 @@ void clear(node **first, node **last)
     
     (*first) = NULL;
     (*last) = NULL;
+}
+
+int getCount(node *first)
+{
+    node *current = first;
+    int count = 0;
+
+    //navigate through list
+    while(current != NULL) 
+    {
+        count++;
+        current = current->next;
+    }
+
+    return count;
 }

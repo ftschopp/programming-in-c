@@ -34,20 +34,19 @@ void createTCPServer(tcpServer *server)
 	fflush(stdout);
 }
 
-tcpClient* acceptConnection(int listenfd)
+int acceptConnection(int listenfd)
 {
-	tcpClient* client = malloc(sizeof(tcpClient));
-    socklen_t clilen = sizeof(client->addr);
-	int connfd = accept(listenfd, (struct sockaddr*)&client->addr, &clilen); 
+	struct sockaddr_in addr;
+    socklen_t clilen = sizeof(addr);
+	int connfd = accept(listenfd, (struct sockaddr*)&addr, &clilen); 
 	
 	if(connfd < 0)
 	{
 		perror("accept error");
-		return NULL;
+		return -1;
 	}
-	client->connfd = connfd; 
 
-	return client;
+	return connfd;
 }
 
 //Imprime la IP 
@@ -102,11 +101,12 @@ void shutdownSocket(int sockfd)
 }
 
 
-tcpClient connectTCPServer(char *hostname, int port)
+int connectTCPServer(char *hostname, int port)
 {
 	int sockfd;
-	tcpClient client;
+	struct sockaddr_in addr;
 	struct hostent *server;
+	int connfd;
    
 	/* Create a socket point */
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -123,15 +123,15 @@ tcpClient connectTCPServer(char *hostname, int port)
 		exit(0);
 	}
 
-	client.addr.sin_family = AF_INET;
-	client.addr.sin_port = htons(port);
-	client.connfd = sockfd;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
 
 	/* Now connect to the server */
-	if (connect(sockfd, (struct sockaddr*)&client.addr, sizeof(client.addr)) < 0) {
+	connfd = connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)); 
+	if (connfd  < 0) {
 		perror("ERROR connecting");
 		exit(1);
 	}
 
-	return client;
+	return sockfd;
 }

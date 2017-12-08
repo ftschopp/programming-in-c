@@ -1,9 +1,12 @@
 CC 		= gcc 
 
-all : pienso
+all : pienso jugador
 
 pienso: common.o mq.o pienso.c	
 	cc -o pienso pienso.c common.o mq.o
+
+jugador: common.o mq.o jugador.c	
+	cc -o jugador jugador.c common.o mq.o
 
 sys_v_semaphore.o : sys_v_semaphore.h sys_v_semaphore.c
 	cc -c sys_v_semaphore.c

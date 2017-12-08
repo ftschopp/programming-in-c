@@ -1,9 +1,9 @@
 #include "funciones.h"
-  
+
 key_t creo_clave(int r_clave)
 {
 	key_t clave;
-	clave = ftok ("/bin/ls", r_clave);	
+	clave = ftok ("/bin/ls", r_clave);
 	if (clave == (key_t)-1)
 	{
 		printf("No puedo conseguir clave para memoria compartida\n");
@@ -17,7 +17,7 @@ int creo_id_memoria(int size, int clave)
 {
 	int id_memoria;
 
-	id_memoria = shmget (creo_clave(clave), size, 0777 | IPC_CREAT);//crea memoria x 50 byte, 
+	id_memoria = shmget (creo_clave(clave), size, 0777 | IPC_CREAT);//crea memoria x 50 byte,
 
 	if (id_memoria == -1)
 	{
@@ -49,7 +49,7 @@ void* creo_memoria(int id_memoria)
 int creo_semaforo(int cuantos)
 {
   key_t clave = creo_clave(CLAVE_BASE);
-  int id_semaforo = semget(clave,cuantos,0600|IPC_CREAT); 
+  int id_semaforo = semget(clave,cuantos,0600|IPC_CREAT);
   if(id_semaforo == -1)
   {
       printf("Error: no puedo crear semaforo\n");
@@ -101,14 +101,14 @@ int enviar_mensaje(int id_cola_mensajes, long rLongDest, int rIntRte, int rIntEv
 	msg.int_evento 	= rIntEvento;
 	strcpy(msg.char_mensaje, rpCharMsg);
 	return msgsnd (id_cola_mensajes, (struct msgbuf *)&msg, sizeof(msg.int_rte)+sizeof(msg.int_evento)+sizeof(msg.char_mensaje), IPC_NOWAIT);
-}		
+}
 
 int recibir_mensaje(int id_cola_mensajes, long rLongDest, mensaje* rMsg)
 {
 	mensaje msg;
 	int res;
 	res = msgrcv (id_cola_mensajes, (struct msgbuf *)&msg,  sizeof(msg.int_rte)+sizeof(msg.int_evento)+sizeof(msg.char_mensaje), 	rLongDest, 0);
-	
+
 	rMsg->long_dest 	    = msg.long_dest;
 	rMsg->int_rte    	= msg.int_rte;
 	rMsg->int_evento 	= msg.int_evento;
@@ -126,5 +126,3 @@ int borrar_mensajes(int id_cola_mensajes)
 	}while(res>0);
 	return res;
 }
-
-

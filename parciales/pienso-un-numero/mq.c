@@ -28,7 +28,7 @@ void cleanMessageQueue(int msqid)
 
 void sendMessageQueue(int msqid, MessageQueue *mq)
 {
-    if (msgsnd(msqid, mq, sizeof((*mq).info), 0) == -1) /* +1 for '\0' */
+    if (msgsnd(msqid, mq, sizeof((*mq).info), IPC_NOWAIT) == -1) /* +1 for '\0' */
     {
         perror("msgsnd");
         exit(1);
@@ -37,9 +37,15 @@ void sendMessageQueue(int msqid, MessageQueue *mq)
 
 void recvMessageQueue(int msqid, MessageQueue *mq)
 {
-    if (msgrcv(msqid, mq, sizeof((*mq).info), 0, 0) == -1) 
+    if (msgrcv(msqid, mq, sizeof((*mq).info), (*mq).mtype, 0) == -1) 
     {
         perror("msgrcv");
         exit(1);
     }
+}
+
+void showMessageQueue(MessageQueue *mq)
+{
+    printf("mtype %ld", mq->mtype);
+    printf(" info: NroJugador: %d NroPensado:%d Evento %d\n", mq->info.nro_jugador, mq->info.nro_pensado, mq->info.event);
 }

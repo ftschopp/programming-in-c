@@ -29,20 +29,26 @@ int main(void)
     printf("Enter lines of text, ^D to quit:\n");
 
     buf.mtype = 1; /* we don't really care in this case */
-
-    while(fgets(buf.info.mtext, sizeof buf.info.mtext, stdin) != NULL) {
-        int len = strlen(buf.info.mtext);
+    //fgets(buf.info.mtext, sizeof buf.info.mtext, stdin);
+    //while(fgets(buf.info.mtext, sizeof buf.info.mtext, stdin) != NULL) {
+    while(1)
+      {
+          printf("aca@");
+            int len = strlen(buf.info.mtext);
 
 
         buf.info.nro_jugador = 99;
         buf.info.nro_pensado = 23;
         /* ditch newline at end, if it exists */
-        if (buf.info.mtext[len-1] == '\n') buf.info.mtext[len-1] = '\0';
+        //if (buf.info.mtext[len-1] == '\n') buf.info.mtext[len-1] = '\0';
 
         // if (msgsnd(msqid, &buf, sizeof(buf.info), 0) == -1) /* +1 for '\0' */
         //     perror("msgsnd");
 
+        printf("\n enviooo");
         sendMessageQueue(msqid, &buf);
+        printf("\n eespero");
+        usleep(1000*800);
     }
 
     cleanMessageQueue(msqid);
