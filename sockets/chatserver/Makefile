@@ -11,7 +11,7 @@ server : server.c tcpserver.o lista.o
 	cc -o server server.c tcpserver.o lista.o -lpthread
 
 client : client.c tcpserver.o 
-	cc -o client client.c tcpserver.o
+	cc -o client client.c tcpserver.o -lpthread
 
 tcpserver.o : tcpserver.c tcpserver.h
 	cc -c tcpserver.c
