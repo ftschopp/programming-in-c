@@ -8,6 +8,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <netdb.h>
 #include "tcpserver.h"
 
 

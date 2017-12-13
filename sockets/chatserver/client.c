@@ -75,6 +75,7 @@ void *handleMessages(void *arg)
     char buffer[1024];
     while(1)
     {
+        memset(buffer, 0, strlen(buffer));
         recv(sockfd, buffer, 1024, 0);
 
         printf("\n%s", buffer);
